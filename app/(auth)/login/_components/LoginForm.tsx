@@ -11,7 +11,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authClient } from '@/lib/auth-client';
-import { GithubIcon, Loader, Mail } from 'lucide-react';
+import { GithubIcon, Loader, Mail, Send } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useTransition, useState } from 'react';
 import { toast } from 'sonner';
 export default function LoginForm() {
@@ -19,7 +20,7 @@ export default function LoginForm() {
   const [emailPending, startEmailTransition] = useTransition();
   const [socialType, setSocialType] = useState('');
   const [email, setEmail] = useState('');
-
+  const router = useRouter();
   const signInwithSocial = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
@@ -58,11 +59,12 @@ export default function LoginForm() {
         type: 'sign-in',
         fetchOptions: {
           onSuccess: () => {
-            toast.success('Login Success you will be redirected automatically');
+            toast.success('OTP sent successfully check your Email');
+            router.push(`/verify-request?email=${email}`); //user will be sent as a param
           },
           onError: (error) => {
-            console.log(error);
-            toast.error(error.error.message);
+            console.log(error.error.message);
+            toast.error('Error sending Email');
           },
         },
       });
@@ -133,8 +135,22 @@ export default function LoginForm() {
             <Label htmlFor='password'>Password</Label>
             <Input id='password' placeholder='**************' type='password' />
           </div> */}
-          <Button className='w-full' onClick={signInwithEmail}>
-            Continue with Email
+          <Button
+            className='w-full'
+            onClick={signInwithEmail}
+            disabled={emailPending}
+          >
+            {emailPending ? (
+              <>
+                <Loader className='mr-2 h-4 w-4 animate-spin' />
+                Loading...
+              </>
+            ) : (
+              <>
+                <Send className='mr-2 h-4 w-4' />
+                Continue with Email
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

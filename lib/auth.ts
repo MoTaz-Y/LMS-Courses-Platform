@@ -24,7 +24,7 @@ export const auth = betterAuth({
         if (type === 'sign-in') {
           // Send the OTP for sign in
           await resend.emails.send({
-            from: 'AlmotazLMS <onboarding@resend.dev>',
+            from: 'AlmotazLMS <onboarding@resend.dev>', // Replace with your email to send to any email
             to: [email],
             subject: 'AlMotazLMS Verify Your Email',
             html: `<p>Your OTP is <strong>${otp}</strong></p>`,
