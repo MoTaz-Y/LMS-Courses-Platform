@@ -8,6 +8,7 @@ import Link from 'next/link';
 // import { toast } from 'sonner';
 import FeatureCard from './_components/FeatureCard';
 import { buttonVariants } from '@/components/ui/button';
+import FrequentlyQuestions from './_components/FrequentlyQuestions';
 
 export default function Home() {
   const { data: session, isPending } = authClient.useSession();
@@ -65,8 +66,11 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className='w-full max-w-6xl mx-auto py-10'>
+      <section className='w-full max-w-6xl mx-auto py-10 mb-32'>
         <FeatureCard />
+      </section>
+      <section className='w-full max-w-6xl mx-auto py-10'>
+        <FrequentlyQuestions />
       </section>
     </>
   );
