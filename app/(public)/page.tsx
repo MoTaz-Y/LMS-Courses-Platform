@@ -1,18 +1,17 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/themeToggle';
 import { authClient } from '@/lib/auth-client';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+// import { useRouter } from 'next/navigation';
+// import { toast } from 'sonner';
 import FeatureCard from './_components/FeatureCard';
+import { buttonVariants } from '@/components/ui/button';
 
 export default function Home() {
   const { data: session, isPending } = authClient.useSession();
-  const router = useRouter();
+  // const router = useRouter();
 
   if (isPending)
     return (
@@ -21,16 +20,16 @@ export default function Home() {
         <p>Loading...</p>
       </div>
     );
-  const SignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push('/');
-          toast.success('Logged out successfully');
-        },
-      },
-    });
-  };
+  // const SignOut = async () => {
+  //   await authClient.signOut({
+  //     fetchOptions: {
+  //       onSuccess: () => {
+  //         router.push('/');
+  //         toast.success('Logged out successfully');
+  //       },
+  //     },
+  //   });
+  // };
   return (
     <>
       <section className='relative py-20'>
@@ -48,12 +47,21 @@ export default function Home() {
             <Link className={buttonVariants({ size: 'lg' })} href='/courses'>
               Browse courses
             </Link>
-            <Link
-              className={buttonVariants({ size: 'lg', variant: 'outline' })}
-              href='/login'
-            >
-              Login
-            </Link>
+            {!session ? (
+              <Link
+                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                href='/sign-in'
+              >
+                Get started
+              </Link>
+            ) : (
+              <Link
+                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                href='/dashboard'
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
         </div>
       </section>
