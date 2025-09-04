@@ -30,6 +30,7 @@ import {
   SelectValue,
   SelectTrigger,
 } from '@/components/ui/select';
+import Tiptap from '@/components/richTextEditor/Tiptap';
 
 const CourseForm = () => {
   // 1. Define your form.
@@ -126,6 +127,19 @@ const CourseForm = () => {
                   className='min-h-[120px]'
                   {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control as Control<CourseSchemaType>}
+          name='description'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Tiptap field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -263,6 +277,7 @@ const CourseForm = () => {
             </FormItem>
           )}
         />
+
         <Button type='submit'>
           Create Course <PlusSquareIcon className='ml-1' size={16} />
         </Button>

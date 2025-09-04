@@ -45,9 +45,20 @@ export default function NavBar() {
             <ThemeToggle />
             {isPending ? null : session ? (
               <UserDropDownMenu
-                name={session.user.name}
+                name={
+                  session?.user.name && session?.user.name.length > 0
+                    ? session?.user.name
+                        .split(' ')
+                        .map((name) => name[0])
+                        .join('')
+                        .toUpperCase()
+                    : session?.user.email[0].toUpperCase()
+                }
                 email={session.user.email}
-                image={session.user.image || ''}
+                image={
+                  session.user.image ||
+                  `https://avatar.vercel.sh/${session?.user.email}`
+                }
               />
             ) : (
               <>
