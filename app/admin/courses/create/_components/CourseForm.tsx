@@ -153,8 +153,7 @@ const CourseForm = () => {
             <FormItem>
               <FormLabel>Thumbnail Image</FormLabel>
               <FormControl>
-                {/* <Input placeholder='thumbnail url' {...field} /> */}
-                <Uploader field={field} />
+                <Uploader onChange={field.onChange} value={field.value} />
               </FormControl>
               <FormMessage />
             </FormItem>

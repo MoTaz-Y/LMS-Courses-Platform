@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { CloudUploadIcon, ImageIcon, XIcon } from 'lucide-react';
+import { CloudUploadIcon, ImageIcon, Loader2, XIcon } from 'lucide-react';
 import React from 'react';
 import { Button } from '../ui/button';
 import Image from 'next/image';
@@ -42,7 +42,15 @@ export function RenderErrorState() {
   );
 }
 
-export function RenderSuccessState({ previewUrl }: { previewUrl: string }) {
+export function RenderSuccessState({
+  previewUrl,
+  isDeleting,
+  handleRemoveFile,
+}: {
+  previewUrl: string;
+  isDeleting: boolean;
+  handleRemoveFile: () => void;
+}) {
   return (
     <div className='text-center'>
       <div className='flex justify-center mx-auto items-center size-12 rounded-full bg-green-300 mb-4'>
@@ -58,8 +66,14 @@ export function RenderSuccessState({ previewUrl }: { previewUrl: string }) {
         variant='destructive'
         size='icon'
         className={`${cn('absolute top-4 right-4')}`}
+        onClick={handleRemoveFile}
+        disabled={isDeleting}
       >
-        <XIcon className={cn('size-4')} />
+        {isDeleting ? (
+          <Loader2 className='size-4 animate-spin' />
+        ) : (
+          <XIcon className='size-4' />
+        )}
       </Button>
     </div>
   );
