@@ -31,6 +31,7 @@ import {
   SelectTrigger,
 } from '@/components/ui/select';
 import Tiptap from '@/components/richTextEditor/Tiptap';
+import Uploader from '@/components/fileUploader/Uploader';
 
 const CourseForm = () => {
   // 1. Define your form.
@@ -152,7 +153,8 @@ const CourseForm = () => {
             <FormItem>
               <FormLabel>Thumbnail Image</FormLabel>
               <FormControl>
-                <Input placeholder='thumbnail url' {...field} />
+                {/* <Input placeholder='thumbnail url' {...field} /> */}
+                <Uploader field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
