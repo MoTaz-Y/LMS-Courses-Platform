@@ -14,11 +14,18 @@ export const fileUploadSchema = zod.object({
 });
 
 export async function POST(request: Request) {
-  console.log(
-    'hello00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-  );
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    });
+  }
+
   try {
-    console.log('hello');
     const body = await request.json();
 
     console.log(body);
@@ -53,11 +60,25 @@ export async function POST(request: Request) {
       'response--------------',
       NextResponse.json(response, { status: 200 })
     );
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: 'Something went wrong', issues: error },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      }
     );
   }
 }

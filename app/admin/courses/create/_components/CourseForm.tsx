@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { PlusSquareIcon, SparkleIcon } from 'lucide-react';
+import { Loader2, PlusSquareIcon, SparkleIcon } from 'lucide-react';
 import slugify from 'slugify';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -32,8 +32,15 @@ import {
 } from '@/components/ui/select';
 import Tiptap from '@/components/richTextEditor/Tiptap';
 import Uploader from '@/components/fileUploader/Uploader';
+import { useTransition } from 'react';
+import { tryCatch } from '@/hooks/try-catch';
+import { CreateCourse } from '../actions';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const CourseForm = () => {
+  const [isPendig, startTransition] = useTransition();
+  const router = useRouter();
   // 1. Define your form.
   const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
@@ -54,9 +61,29 @@ const CourseForm = () => {
 
   // 2. Define a submit handler.
   function onSubmit(values: CourseSchemaType) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    startTransition(async () => {
+      const { data, error } = await tryCatch(CreateCourse(values));
+      // checked on the server side
+      if (error) {
+        toast.error('Something went wrong while creating the course');
+        return;
+      }
+      // checked on the client side
+      if (!data) {
+        toast.error('Something went wrong while creating the course');
+        return;
+      }
+      if (data.status === 'success') {
+        toast.success('Course created successfully');
+        form.reset();
+        // redirect to the course page
+        // router.push(`/courses/${data.course.slug}`);
+        router.push(`/admin/courses`);
+      } else if (data.status === 'error') {
+        toast.error(data.message);
+        return;
+      }
+    });
   }
   return (
     <Form {...form}>
@@ -116,7 +143,7 @@ const CourseForm = () => {
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control as Control<CourseSchemaType>}
           name='description'
           render={({ field }) => (
@@ -132,7 +159,7 @@ const CourseForm = () => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control as Control<CourseSchemaType>}
           name='description'
@@ -279,8 +306,16 @@ const CourseForm = () => {
           )}
         />
 
-        <Button type='submit'>
-          Create Course <PlusSquareIcon className='ml-1' size={16} />
+        <Button type='submit' disabled={isPendig}>
+          {isPendig ? (
+            <>
+              Creating Course... <Loader2 className='animate-spin' />
+            </>
+          ) : (
+            <>
+              Create Course <PlusSquareIcon className='ml-1' size={16} />
+            </>
+          )}
         </Button>
       </form>
     </Form>

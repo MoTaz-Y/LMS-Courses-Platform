@@ -49,6 +49,7 @@ function Uploader({ value, onChange }: iAppProps) {
     try {
       const preSignedResponse = await fetch('/api/s3/upload', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -56,7 +57,7 @@ function Uploader({ value, onChange }: iAppProps) {
           fileName: file.name,
           contentType: file.type,
           size: file.size,
-          isImage: file.type.startsWith('image/'), // Change this to true if the file is an image dynamicly
+          isImage: file.type.startsWith('image/'),
         }),
       });
       if (!preSignedResponse.ok) {
@@ -107,7 +108,9 @@ function Uploader({ value, onChange }: iAppProps) {
           reject(new Error('Error uploading file. Please try again later.'));
         };
         xhr.open('PUT', presignedUrl, true);
+        xhr.withCredentials = true;
         xhr.setRequestHeader('Content-Type', file.type);
+        xhr.setRequestHeader('Origin', 'http://localhost:3000');
         xhr.send(file);
         console.log('xhr1-1-1-1-1-1-1-1-1-1-1-1', xhr);
       });
