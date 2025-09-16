@@ -34,7 +34,7 @@ export const courseSchema = z.object({
   level: z.enum(courseLevel, {
     message: 'Invalid course level',
   }),
-  image: z.string().min(1, 'Image is required'),
+  // image: z.string().min(1, 'Image is required'),
   category: z.enum(courseCategories, {
     message: 'Invalid course category',
   }),

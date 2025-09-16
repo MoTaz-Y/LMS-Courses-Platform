@@ -39,6 +39,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
 const CourseForm = () => {
+  console.log('CourseForm component is rendering.');
   const [isPendig, startTransition] = useTransition();
   const router = useRouter();
   // 1. Define your form.
@@ -51,7 +52,7 @@ const CourseForm = () => {
       fileKey: '',
       duration: 0,
       level: 'BEGINNER',
-      image: '',
+      // image: '',
       category: 'General',
       smallDescription: '',
       slug: '',
@@ -61,8 +62,11 @@ const CourseForm = () => {
 
   // 2. Define a submit handler.
   function onSubmit(values: CourseSchemaType) {
+    console.log('these are the values', values);
     startTransition(async () => {
+      console.log('these are the values', values);
       const { data, error } = await tryCatch(CreateCourse(values));
+      console.log('data from inside', data);
       // checked on the server side
       if (error) {
         toast.error('Something went wrong while creating the course');
@@ -306,7 +310,14 @@ const CourseForm = () => {
           )}
         />
 
-        <Button type='submit' disabled={isPendig}>
+        <Button
+          type='submit'
+          disabled={isPendig}
+          onClick={() => {
+            console.log(form.getValues());
+            onSubmit(form.getValues());
+          }}
+        >
           {isPendig ? (
             <>
               Creating Course... <Loader2 className='animate-spin' />

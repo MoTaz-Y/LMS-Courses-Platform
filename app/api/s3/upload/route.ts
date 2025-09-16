@@ -5,6 +5,8 @@ import { env } from '@/lib/env';
 import { v4 as uuidv4 } from 'uuid';
 import { s3Client } from '@/lib/S3Client';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import arcjet, { detectBot, fixedWindow } from '@/lib/arcjet';
+import { requireAdmin } from '@/app/data/admin/require-admin';
 
 export const fileUploadSchema = zod.object({
   fileName: zod.string().min(1, 'File name is required'),
@@ -12,6 +14,21 @@ export const fileUploadSchema = zod.object({
   size: zod.number().min(1, 'File size is required'),
   isImage: zod.boolean(),
 });
+
+const aj = arcjet
+  .withRule(
+    detectBot({
+      mode: 'LIVE',
+      allow: [],
+    })
+  )
+  .withRule(
+    fixedWindow({
+      mode: 'LIVE',
+      window: '1m',
+      max: 5,
+    })
+  );
 
 export async function POST(request: Request) {
   if (request.method === 'OPTIONS') {
@@ -24,8 +41,15 @@ export async function POST(request: Request) {
       },
     });
   }
+  const session = await requireAdmin();
 
   try {
+    const decision = await aj.protect(request, {
+      fingerprint: session?.user.id as string,
+    });
+    if (decision.isDenied()) {
+      return NextResponse.json({ error: 'attack identified' }, { status: 429 });
+    }
     const body = await request.json();
 
     console.log(body);
@@ -40,6 +64,7 @@ export async function POST(request: Request) {
     const { fileName, contentType, size, isImage } = valildation.data;
     const uniqueFileName = `${uuidv4()}-${fileName}`;
     console.log(uniqueFileName, 'uniqueFileName');
+    console.log('contentType--------------', contentType);
     const command = new PutObjectCommand({
       Bucket: env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGES,
       Key: uniqueFileName,
@@ -60,7 +85,7 @@ export async function POST(request: Request) {
       'response--------------',
       NextResponse.json(response, { status: 200 })
     );
-    return NextResponse.json(response, {
+    const nextResponse = NextResponse.json(response, {
       status: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -68,6 +93,9 @@ export async function POST(request: Request) {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
+
+    console.log('next response =-=-=-=-=-=-=-=-=-=-=-=-', nextResponse);
+    return nextResponse;
   } catch (error) {
     return NextResponse.json(
       { error: 'Something went wrong', issues: error },

@@ -1,5 +1,3 @@
-import 'server-only';
-
 // this file is for connecting to the database because prisma client is not compatible with nextjs as nextjs is serverless
 
 import { PrismaClient } from './generated/prisma';

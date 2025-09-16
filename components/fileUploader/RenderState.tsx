@@ -28,16 +28,23 @@ const RenderState = ({ isDragActive }: { isDragActive: boolean }) => {
   );
 };
 
-export function RenderErrorState() {
+export function RenderErrorState({ isDragActive }: { isDragActive: boolean }) {
   return (
     <div className='text-center'>
       <div className='flex justify-center mx-auto items-center size-12 rounded-full bg-destructive/30 mb-4'>
-        <ImageIcon className={cn('size-6 text-destructive')} />
+        {isDragActive ? (
+          <CloudUploadIcon className={cn('size-6 text-primary')} />
+        ) : (
+          <ImageIcon className={cn('size-6 text-destructive')} />
+        )}
       </div>
       <p className='text-base font-semibold'>Upload Failed</p>
       <p className='text-xs mt-1 text-muted-foreground'>
         Something went wrong, <br /> Click or drag and drop to try again.
       </p>
+      <Button type='button' className='mt-4'>
+        Select File
+      </Button>
     </div>
   );
 }
@@ -87,14 +94,11 @@ export function RenderLoadingState({
   file: File;
 }) {
   return (
-    <div className='text-center flex justify-center items-center'>
+    <div className='text-center flex flex-col justify-center items-center'>
       <p>{progress}%</p>
-      <p className='text-sm mt-2 font-medium text-foreground'>
-        Uploading{' '}
-        <span className='text-xs text-muted-foreground truncate max-w-xs'>
-          {file.name}
-        </span>
-        ...
+      <p className='text-sm mt-2 font-medium text-foreground'>Uploading ...</p>
+      <p className='text-xs text-muted-foreground truncate max-w-xs'>
+        {file.name}
       </p>
     </div>
   );

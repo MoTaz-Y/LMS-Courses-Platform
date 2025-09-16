@@ -37,8 +37,8 @@ function Uploader({ value, onChange }: iAppProps) {
     isDeleting: false,
     error: false,
     fileType: 'image',
-    objectUrl: '',
-    key: value,
+    objectUrl: '', //
+    key: value, //
   });
   const uploadFile = async (file: File) => {
     setFileState((prev) => ({
@@ -49,7 +49,7 @@ function Uploader({ value, onChange }: iAppProps) {
     try {
       const preSignedResponse = await fetch('/api/s3/upload', {
         method: 'POST',
-        credentials: 'include',
+        // credentials: 'include',//
         headers: {
           'Content-Type': 'application/json',
         },
@@ -60,6 +60,7 @@ function Uploader({ value, onChange }: iAppProps) {
           isImage: file.type.startsWith('image/'),
         }),
       });
+      console.log('file////////////////////////////////////', file);
       if (!preSignedResponse.ok) {
         toast.error('Error uploading file. Please try again later.');
         setFileState((prev) => ({
@@ -74,6 +75,7 @@ function Uploader({ value, onChange }: iAppProps) {
       console.log('presignedUrl', presignedUrl);
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
+        console.log('xhr request', xhr);
         xhr.upload.onprogress = (event) => {
           console.log('event lengthComputable', event);
           if (event.lengthComputable) {
@@ -96,10 +98,13 @@ function Uploader({ value, onChange }: iAppProps) {
               progress: 100,
               key: key,
             }));
-            onChange?.(key);
+            onChange?.(key); //
             toast.success('File uploaded successfully');
             resolve();
           } else {
+            toast.error(
+              'Error uploading file. Please try again later. ********************************'
+            );
             reject(new Error('Error uploading file. Please try again later.'));
           }
         };
@@ -107,15 +112,17 @@ function Uploader({ value, onChange }: iAppProps) {
           console.log('xhr.onerror', xhr);
           reject(new Error('Error uploading file. Please try again later.'));
         };
-        xhr.open('PUT', presignedUrl, true);
-        xhr.withCredentials = true;
+        xhr.open('PUT', presignedUrl);
+        // xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', file.type);
-        xhr.setRequestHeader('Origin', 'http://localhost:3000');
+        // xhr.setRequestHeader('Origin', 'http://localhost:3000');
         xhr.send(file);
         console.log('xhr1-1-1-1-1-1-1-1-1-1-1-1', xhr);
       });
     } catch {
-      toast.error('Error uploading file. Please try again later.');
+      // toast.error(
+      //   'Error uploading file. Please try again later. ********************************'
+      // );
       setFileState((prev) => ({
         ...prev,
         uploading: false,
@@ -127,18 +134,22 @@ function Uploader({ value, onChange }: iAppProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Do something with the files
-      const file = acceptedFiles[0];
       if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
         setFileState({
           id: uuidv4(),
-          file,
+          file: file,
           uploading: false,
           progress: 0,
           isDeleting: false,
           error: false,
           fileType: 'image',
           objectUrl: URL.createObjectURL(file),
+          key: value, //
         });
+        console.log('files', acceptedFiles);
+        console.log('file0', file);
+        uploadFile(file);
       }
       // if (fileState.id) {
       //   setFileState((prev) => ({
@@ -157,7 +168,6 @@ function Uploader({ value, onChange }: iAppProps) {
       if (fileState.objectUrl && !fileState.objectUrl.startsWith('http')) {
         URL.revokeObjectURL(fileState.objectUrl);
       }
-      uploadFile(file);
     },
     [fileState.objectUrl]
   );
@@ -237,7 +247,7 @@ function Uploader({ value, onChange }: iAppProps) {
   }
   function renderContent() {
     if (fileState.error) {
-      return <RenderErrorState />;
+      return <RenderErrorState isDragActive={isDragActive} />;
     } else if (fileState.uploading) {
       return (
         <RenderLoadingState
@@ -278,7 +288,7 @@ function Uploader({ value, onChange }: iAppProps) {
   return (
     <Card
       className={cn(
-        'relative border-2 border-dashed transition-colors duration-200 ease-in-out w-full h-64',
+        'relative border-2 border-dashed transition-colors duration-200 ease-in-out w-full min-h-[200px]',
         isDragActive
           ? 'border-primary bg-primary/10 border-solid'
           : 'border-border hover:border-primary hover:bg-muted/20 hover:border-solid'
