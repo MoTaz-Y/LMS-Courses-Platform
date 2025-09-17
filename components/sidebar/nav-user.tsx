@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { authClient } from '@/lib/auth-client';
-import { Loader, Tv2 } from 'lucide-react';
+import { HomeIcon, Loader, Tv2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSignout } from '@/hooks/use-signout';
 
@@ -129,6 +129,12 @@ export function NavUser() {
                 <Link href='/admin/courses'>
                   <Tv2 />
                   Courses
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href='/'>
+                  <HomeIcon />
+                  Home
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
