@@ -61,7 +61,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const { fileName, contentType, size, isImage } = valildation.data;
+    const { fileName, contentType /*, size, isImage */ } = valildation.data;
     const uniqueFileName = `${uuidv4()}-${fileName}`;
     console.log(uniqueFileName, 'uniqueFileName');
     console.log('contentType--------------', contentType);
