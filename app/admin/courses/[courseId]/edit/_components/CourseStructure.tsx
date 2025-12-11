@@ -40,6 +40,8 @@ import { toast } from 'sonner';
 import { reorderChapters, reorderLessons } from '../action';
 import NewChapterModal from './NewChapterModal';
 import NewLessonModal from './NewLessonModal';
+import DeleteLesson from './DeleteLesson';
+import DeleteChapter from './DeleteChapter';
 interface iAppProps {
   data: AdminCourseSingualrType;
 }
@@ -329,14 +331,11 @@ const CourseStructure = ({ data }: iAppProps) => {
                               </Button>
                             </CollapsibleTrigger>
                           </div>
-                          <Button
-                            variant={'outline'}
-                            size={'icon'}
-                            className='cursor-pointer text-destructive'
-                            // onClick={() => handleDeleteChapter(item.id)}
-                          >
-                            <Trash2 size={20} />
-                          </Button>
+
+                          <DeleteChapter
+                            chapterId={item.id}
+                            courseId={data.id}
+                          />
                         </div>
                         <CollapsibleContent>
                           <div className='p-3'>
@@ -368,13 +367,11 @@ const CourseStructure = ({ data }: iAppProps) => {
                                           {lesson.title}
                                         </Link>
                                       </div>
-                                      <Button
-                                        variant={'outline'}
-                                        size={'icon'}
-                                        className='cursor-pointer '
-                                      >
-                                        <Trash2 size={20} />
-                                      </Button>
+                                      <DeleteLesson
+                                        lessonId={lesson.id}
+                                        chapterId={item.id}
+                                        courseId={data.id}
+                                      />
                                     </div>
                                   )}
                                 </SortableItem>

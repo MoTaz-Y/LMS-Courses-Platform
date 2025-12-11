@@ -198,11 +198,26 @@ export async function deleteChapter(
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
-    await prisma.chapter.delete({
-      where: {
-        id: chapterId,
-        courseId: courseId,
-      },
+    const chapter = await prisma.chapter.findUnique({
+      where: { id: chapterId },
+      select: { position: true },
+    });
+    if (!chapter) return { status: 'error', message: 'Chapter not found' };
+    await prisma.$transaction(async (tx) => {
+      await tx.chapter.delete({
+        where: {
+          id: chapterId,
+        },
+      });
+      await tx.chapter.updateMany({
+        where: {
+          courseId: courseId,
+          position: { gt: chapter.position },
+        },
+        data: {
+          position: { decrement: 1 },
+        },
+      });
     });
     revalidatePath(`/admin/courses/${courseId}/edit`);
     return { message: 'Chapter deleted successfully', status: 'success' };
@@ -252,22 +267,108 @@ export async function createLesson(
   }
 }
 
+// export async function deleteLesson(
+//   lessonId: string,
+//   chapterId: string,
+//   courseId: string
+// ): Promise<ApiResponse> {
+//   await requireAdmin();
+//   try {
+//     // we have to check the oreder of the lessons and if the deleted lesson is not the last one we have to update the order of the lessons
+//     const chapterWithLessons = await prisma.chapter.findUnique({
+//       where: {
+//         id: chapterId,
+//       },
+//       select: {
+//         lessons: {
+//           select: {
+//             id: true,
+//             position: true,
+//           },
+//           orderBy: {
+//             position: 'asc',
+//           },
+//         },
+//       },
+//     });
+//     if (!chapterWithLessons) {
+//       return { message: 'Chapter not found', status: 'error' };
+//     }
+//     const lessonIndex = chapterWithLessons?.lessons.findIndex(
+//       (lesson) => lesson.id === lessonId
+//     );
+//     if (lessonIndex === -1) {
+//       return { message: 'Lesson not found', status: 'error' };
+//     }
+//     const isLastLesson = lessonIndex === chapterWithLessons?.lessons.length - 1;
+//     if (!isLastLesson) {
+//       const lessonsToUpdate = chapterWithLessons?.lessons
+//         .slice(lessonIndex + 1)
+//         .map((lesson) => ({
+//           id: lesson.id,
+//           position: lesson.position - 1,
+//         }));
+//       await prisma.$transaction(
+//         lessonsToUpdate.map((lesson) =>
+//           prisma.lesson.update({
+//             where: {
+//               id: lesson.id,
+//             },
+//             data: {
+//               position: lesson.position,
+//             },
+//           })
+//         )
+//       );
+//     }
+//     await prisma.lesson.delete({
+//       where: {
+//         id: lessonId,
+//         chapterId: chapterId,
+//       },
+//     });
+//     revalidatePath(`/admin/courses/${courseId}/edit`);
+//     return { message: 'Lesson deleted successfully', status: 'success' };
+//   } catch {
+//     return { message: 'Error deleting lesson', status: 'error' };
+//   }
+// }
 export async function deleteLesson(
   lessonId: string,
   chapterId: string,
   courseId: string
 ): Promise<ApiResponse> {
   await requireAdmin();
+
   try {
-    await prisma.lesson.delete({
-      where: {
-        id: lessonId,
-        chapterId: chapterId,
-      },
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      select: { position: true },
     });
+
+    if (!lesson) return { status: 'error', message: 'Lesson not found' };
+
+    await prisma.$transaction(async (tx) => {
+      await tx.lesson.updateMany({
+        where: {
+          chapterId,
+          position: { gt: lesson.position },
+        },
+        data: {
+          position: { decrement: 1 },
+        },
+      });
+
+      await tx.lesson.delete({
+        where: { id: lessonId },
+      });
+    });
+
     revalidatePath(`/admin/courses/${courseId}/edit`);
-    return { message: 'Lesson deleted successfully', status: 'success' };
-  } catch {
-    return { message: 'Error deleting lesson', status: 'error' };
+
+    return { status: 'success', message: 'Lesson deleted successfully' };
+  } catch (error) {
+    console.error(error);
+    return { status: 'error', message: 'Error deleting lesson' };
   }
 }
