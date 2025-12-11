@@ -38,6 +38,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { reorderChapters, reorderLessons } from '../action';
+import NewChapterModal from './NewChapterModal';
+import NewLessonModal from './NewLessonModal';
 interface iAppProps {
   data: AdminCourseSingualrType;
 }
@@ -280,7 +282,8 @@ const CourseStructure = ({ data }: iAppProps) => {
     >
       <Card>
         <CardHeader className='flex flex-row items-center justify-between border-b border-border'>
-          <CardTitle>Course Structure</CardTitle>
+          <CardTitle>Chapters</CardTitle>
+          <NewChapterModal courseId={data.id} />
         </CardHeader>
         <CardContent className='overflow-y-auto h-[1000px] space-y-4'>
           <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -330,6 +333,7 @@ const CourseStructure = ({ data }: iAppProps) => {
                             variant={'outline'}
                             size={'icon'}
                             className='cursor-pointer text-destructive'
+                            // onClick={() => handleDeleteChapter(item.id)}
                           >
                             <Trash2 size={20} />
                           </Button>
@@ -377,10 +381,10 @@ const CourseStructure = ({ data }: iAppProps) => {
                               ))}
                             </SortableContext>
                             <div className='p-3 ml-3'>
-                              <Button variant={'outline'} className='w-full'>
-                                <FileText size={20} />
-                                Add New Lesson
-                              </Button>
+                              <NewLessonModal
+                                chapterId={item.id}
+                                courseId={data.id}
+                              />
                             </div>
                           </div>
                         </CollapsibleContent>

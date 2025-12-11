@@ -3,7 +3,14 @@
 import { requireAdmin } from '@/app/data/admin/require-admin';
 import { prisma } from '@/lib/db';
 import { ApiResponse } from '@/lib/types';
-import { courseSchema, CourseSchemaType } from '@/lib/zodSchemas';
+import {
+  chapterSchema,
+  ChapterSchemaType,
+  courseSchema,
+  CourseSchemaType,
+  lessonSchema,
+  LessonSchemaType,
+} from '@/lib/zodSchemas';
 import arcjet, { detectBot, fixedWindow } from '@/lib/arcjet';
 import { request } from '@arcjet/next';
 import { revalidatePath } from 'next/cache';
@@ -128,5 +135,139 @@ export async function reorderChapters(
       status: 'error',
       message: 'Failed to reorder chapters',
     };
+  }
+}
+
+export async function createChapter(
+  values: ChapterSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    const result = chapterSchema.safeParse(values);
+    if (!result.success) {
+      return { status: 'error', message: 'Invalid data' };
+    }
+    // using transaction in here is very critical to insures data integrity if two users try to create a chapter at the same time they will not overwrite each other or get the same position number
+    await prisma.$transaction(async (tx) => {
+      const maxPos = await tx.chapter.aggregate({
+        where: {
+          courseId: values.courseId,
+        },
+        _max: {
+          position: true,
+        },
+      });
+      await tx.chapter.create({
+        data: {
+          title: result.data.name,
+          courseId: result.data.courseId,
+          position: (maxPos._max.position ?? 0) + 1,
+        },
+      });
+    });
+    // await prisma.$transaction( async (tx)=>{
+    //   const maxPos = await tx.chapter.findFirst ({
+    //     where: {
+    //       courseId: values.courseId,
+    //     },
+    //     orderBy: {
+    //       position: 'desc',
+    //     },
+    //     select: {
+    //       position: true,
+    //     },
+    //   });
+    //   await tx.chapter.create({
+    //     data: {
+    //       title: result.data.name,
+    //       courseId: result.data.courseId,
+    //       position: maxPos ? maxPos.position + 1 : 1,
+    //     },
+    //   });
+    // });
+    revalidatePath(`/admin/courses/${values.courseId}/edit`);
+    return { message: 'Chapter created successfully', status: 'success' };
+  } catch {
+    return { message: 'Error parsing data', status: 'error' };
+  }
+}
+
+export async function deleteChapter(
+  chapterId: string,
+  courseId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    await prisma.chapter.delete({
+      where: {
+        id: chapterId,
+        courseId: courseId,
+      },
+    });
+    revalidatePath(`/admin/courses/${courseId}/edit`);
+    return { message: 'Chapter deleted successfully', status: 'success' };
+  } catch {
+    return { message: 'Error deleting chapter', status: 'error' };
+  }
+}
+
+export async function createLesson(
+  values: LessonSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    const result = lessonSchema.safeParse(values);
+    console.log('result', result);
+    if (!result.success) {
+      return { status: 'error', message: 'Invalid data' };
+    }
+    await prisma.$transaction(async (tx) => {
+      // console.log('tx', tx.lesson);
+      const maxPos = await tx.lesson.findFirst({
+        where: {
+          chapterId: values.chapterId,
+        },
+        orderBy: {
+          position: 'desc',
+        },
+        select: {
+          position: true,
+        },
+      });
+      await tx.lesson.create({
+        data: {
+          title: result.data.name,
+          description: result.data.description,
+          videoKey: result.data.videoKey,
+          thumbnailkey: result.data.thumbnailkey,
+          chapterId: result.data.chapterId,
+          position: (maxPos?.position ?? 0) + 1,
+        },
+      });
+    });
+    revalidatePath(`/admin/courses/${values.courseId}/edit`);
+    return { message: 'Lesson created successfully', status: 'success' };
+  } catch {
+    return { message: 'Error parsing data', status: 'error' };
+  }
+}
+
+export async function deleteLesson(
+  lessonId: string,
+  chapterId: string,
+  courseId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    await prisma.lesson.delete({
+      where: {
+        id: lessonId,
+        chapterId: chapterId,
+      },
+    });
+    revalidatePath(`/admin/courses/${courseId}/edit`);
+    return { message: 'Lesson deleted successfully', status: 'success' };
+  } catch {
+    return { message: 'Error deleting lesson', status: 'error' };
   }
 }

@@ -47,6 +47,30 @@ export const courseSchema = z.object({
     message: 'Invalid course status',
   }),
 });
+
+export const chapterSchema = z.object({
+  name: z.string().min(3, 'Title is required').max(50, 'Title is too long'),
+  courseId: z.string().uuid({ message: 'Invalid course id' }),
+  // description: z
+  //   .string()
+  //   .min(3, 'Description is required')
+  //   .max(500, 'Description is too long'),
+});
+
+export const lessonSchema = z.object({
+  name: z.string().min(3, 'Title is required').max(50, 'Title is too long'),
+  chapterId: z.string().uuid({ message: 'Invalid chapter id' }),
+  courseId: z.string().uuid({ message: 'Invalid course id' }),
+  description: z
+    .string()
+    .min(3, 'Description is required')
+    .max(500, 'Description is too long')
+    .optional(),
+  thumbnailkey: z.string().optional(),
+  videoKey: z.string().optional(),
+});
 export type CourseSchemaType = z.infer<typeof courseSchema>;
+export type ChapterSchemaType = z.infer<typeof chapterSchema>;
+export type LessonSchemaType = z.infer<typeof lessonSchema>;
 
 // some medical course categories
