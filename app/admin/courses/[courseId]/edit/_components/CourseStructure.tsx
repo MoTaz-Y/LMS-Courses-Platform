@@ -32,7 +32,6 @@ import {
   ChevronRight,
   FileText,
   GripVertical,
-  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -131,7 +130,6 @@ const CourseStructure = ({ data }: iAppProps) => {
     let targetChapterId: UniqueIdentifier | null = null;
     if (activeType === 'chapter') {
       targetChapterId = overId;
-      console.log('targetChapterId', targetChapterId);
       if (overType === 'chapter') {
         targetChapterId = overId;
       } else if (overType === 'lesson') {
@@ -143,8 +141,7 @@ const CourseStructure = ({ data }: iAppProps) => {
       }
       const oldIndex = items.findIndex((item) => item.id === activeId);
       const newIndex = items.findIndex((item) => item.id === targetChapterId);
-      console.log('oldIndex', oldIndex);
-      console.log('newIndex', newIndex);
+
       if (oldIndex === -1 || newIndex === -1) {
         toast.error('Could not determine old or new chapter for reordering.');
         return;
@@ -184,8 +181,10 @@ const CourseStructure = ({ data }: iAppProps) => {
     if (activeType === 'lesson') {
       const activeChapterId = active.data.current?.chapterId;
       const overChapterId = over.data.current?.chapterId;
-      if (activeChapterId !== overChapterId) {
-        toast.error('Cannot move lesson between chapters.');
+      if (!activeChapterId || activeChapterId !== overChapterId) {
+        toast.error(
+          'Lesson can not be moved between chapters or invalid Chapter ID please try again.'
+        );
         return;
       }
       const oldIndex = items

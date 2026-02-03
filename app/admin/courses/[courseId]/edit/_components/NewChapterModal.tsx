@@ -60,6 +60,9 @@ const NewChapterModal = ({ courseId }: { courseId: string }) => {
     });
   };
   const handleOpen = (isOpen: boolean) => {
+    if (!isOpen) {
+      form.reset();
+    }
     setIsOpen(isOpen);
   };
   return (

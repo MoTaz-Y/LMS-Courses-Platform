@@ -66,6 +66,9 @@ const NewLessonModal = ({
     });
   };
   const handleOpen = (isOpen: boolean) => {
+    if (!isOpen) {
+      form.reset();
+    }
     setIsOpen(isOpen);
   };
   return (
@@ -91,7 +94,7 @@ const NewLessonModal = ({
                 <FormItem className='w-full'>
                   <FormLabel>Lesson Name</FormLabel>
                   <FormControl>
-                    <Input placeholder='Chapter Name' {...field} />
+                    <Input placeholder='Lesson Name' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

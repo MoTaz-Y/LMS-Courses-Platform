@@ -98,6 +98,7 @@ export async function reorderLessons(
     );
     await prisma.$transaction(updates);
     revalidatePath(`/admin/courses/${courseId}/edit`);
+    // that tells next.js to revalidate the path and regenerate the cache for this path so that the new order of the lessons is reflected on the page
     return { status: 'success', message: 'Lessons reordered successfully' };
   } catch {
     return {
@@ -198,11 +199,17 @@ export async function deleteChapter(
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+      select: { id: true },
+    });
+    if (!course) return { status: 'error', message: 'Course not found' };
     const chapter = await prisma.chapter.findUnique({
       where: { id: chapterId },
       select: { position: true },
     });
     if (!chapter) return { status: 'error', message: 'Chapter not found' };
+
     await prisma.$transaction(async (tx) => {
       await tx.chapter.delete({
         where: {
@@ -341,14 +348,21 @@ export async function deleteLesson(
   await requireAdmin();
 
   try {
+    const chapter = await prisma.chapter.findUnique({
+      where: { id: chapterId },
+      select: { position: true },
+    });
+    if (!chapter) return { status: 'error', message: 'Chapter not found' };
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
       select: { position: true },
     });
 
     if (!lesson) return { status: 'error', message: 'Lesson not found' };
-
     await prisma.$transaction(async (tx) => {
+      await tx.lesson.delete({
+        where: { id: lessonId },
+      });
       await tx.lesson.updateMany({
         where: {
           chapterId,
@@ -357,10 +371,6 @@ export async function deleteLesson(
         data: {
           position: { decrement: 1 },
         },
-      });
-
-      await tx.lesson.delete({
-        where: { id: lessonId },
       });
     });
 
