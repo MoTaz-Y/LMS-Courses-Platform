@@ -23,7 +23,9 @@ const Tiptap = ({ field }: { field: any }) => {
     onUpdate: ({ editor }) => {
       field.onChange(JSON.stringify(editor.getJSON()));
     },
-    content: field.value ? JSON.parse(field.value) : '<p>Hello World!</p>',
+    content: field.value
+      ? (JSON.parse(field.value) ?? '<p>Hello there</p>')
+      : '<p>Hello there</p>',
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   });

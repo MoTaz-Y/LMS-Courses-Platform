@@ -79,7 +79,7 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
               const percentageComplete = Math.round(
-                (event.loaded / event.total) * 100
+                (event.loaded / event.total) * 100,
               );
               setFileState((prev) => ({
                 ...prev,
@@ -100,10 +100,10 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
               resolve();
             } else {
               toast.error(
-                'Error uploading file. Please try again later. ********************************'
+                'Error uploading file. Please try again later. ********************************',
               );
               reject(
-                new Error('Error uploading file. Please try again later.')
+                new Error('Error uploading file. Please try again later.'),
               );
             }
           };
@@ -128,7 +128,7 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
         }));
       }
     },
-    [fileTypeAccepted, onChange]
+    [fileTypeAccepted, onChange],
   );
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -154,7 +154,7 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
         URL.revokeObjectURL(fileState.objectUrl);
       }
     },
-    [fileState.objectUrl, fileTypeAccepted, value, uploadFile]
+    [fileState.objectUrl, fileTypeAccepted, value, uploadFile],
   );
   async function handleRemoveFile() {
     if (fileState.isDeleting || !fileState.objectUrl) return;
@@ -210,13 +210,13 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
   function rejectedFile(fileRejection: FileRejection[]) {
     if (fileRejection.length > 0) {
       const tooManyFiles = fileRejection.find(
-        (rejection) => rejection.errors[0].code === 'too-many-files'
+        (rejection) => rejection.errors[0].code === 'too-many-files',
       );
       const fileTooLarge = fileRejection.find(
-        (rejection) => rejection.errors[0].code === 'file-too-large'
+        (rejection) => rejection.errors[0].code === 'file-too-large',
       );
       const fileInvalidType = fileRejection.find(
-        (rejection) => rejection.errors[0].code === 'file-invalid-type'
+        (rejection) => rejection.errors[0].code === 'file-invalid-type',
       );
 
       if (tooManyFiles) {
@@ -281,7 +281,7 @@ function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
         'relative border-2 border-dashed transition-colors duration-200 ease-in-out w-full min-h-[200px]',
         isDragActive
           ? 'border-primary bg-primary/10 border-solid'
-          : 'border-border hover:border-primary hover:bg-muted/20 hover:border-solid'
+          : 'border-border hover:border-primary hover:bg-muted/20 hover:border-solid',
       )}
       {...getRootProps()}
     >

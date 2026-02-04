@@ -12,19 +12,20 @@ const aj = arcjet
     detectBot({
       mode: 'LIVE',
       allow: [],
-    })
+    }),
   )
   .withRule(
     fixedWindow({
       mode: 'LIVE',
       window: '1m',
       max: 1,
-    })
+    }),
   );
 
-export async function editLesson(
+export async function updateLesson(
   data: LessonSchemaType,
-  courseId: string
+  lessonId: string,
+  courseId: string,
 ): Promise<ApiResponse> {
   const req = await request();
   const user = await requireAdmin();
@@ -56,14 +57,20 @@ export async function editLesson(
     if (!result.success) {
       return { status: 'error', message: 'Invalid data' };
     }
-    await prisma.course.update({
-      where: { id: courseId, userId: user.user.id },
+    await prisma.lesson.update({
+      where: { id: lessonId },
       data: {
-        ...result.data,
+        // ...result.data,
+        // // or we can do it like this
+        title: result.data.name,
+        description: result.data.description,
+        thumbnailkey: result.data.thumbnailkey,
+        videoKey: result.data.videoKey,
+        chapterId: result.data.chapterId,
       },
     });
     revalidatePath(`/admin/courses/${courseId}/edit`);
-    return { message: 'Course edited successfully', status: 'success' };
+    return { message: 'Lesson updated successfully', status: 'success' };
   } catch {
     return { message: 'Error parsing data', status: 'error' };
   }

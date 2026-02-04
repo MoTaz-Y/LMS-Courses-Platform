@@ -5,7 +5,6 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LessonForm from './_components/LessonForm';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
@@ -20,6 +19,7 @@ type Params = Promise<{
 export default async function LessonPage({ params }: { params: Params }) {
   const { courseId, chapterId, lessonId } = await params;
   const data = await getLesson(lessonId);
+  console.log('data', data);
 
   return (
     <div>

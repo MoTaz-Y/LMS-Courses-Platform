@@ -19,7 +19,7 @@ import Tiptap from '@/components/richTextEditor/Tiptap';
 import Uploader from '@/components/fileUploader/Uploader';
 import { useTransition } from 'react';
 import { tryCatch } from '@/hooks/try-catch';
-import { editLesson } from '../action';
+import { updateLesson } from '../action';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { AdminLessonSingualrType } from '@/app/data/admin/adming-get-lesson';
@@ -30,7 +30,7 @@ interface iAppProps {
   courseId: string;
 }
 
-const EditCourseForm = ({ data, chapterId, courseId }: iAppProps) => {
+const LessonForm = ({ data, chapterId, courseId }: iAppProps) => {
   const [isPendig, startTransition] = useTransition();
   const router = useRouter();
   // 1. Define your form.
@@ -49,27 +49,28 @@ const EditCourseForm = ({ data, chapterId, courseId }: iAppProps) => {
   // 2. Define a submit handler.
   function onSubmit(values: LessonSchemaType) {
     startTransition(async () => {
-      console.log('these are the values', values);
+      console.log('values', values);
       const { data: result, error } = await tryCatch(
-        editLesson(values, data.id)
+        updateLesson(values, data.id, courseId),
       );
-      console.log('data from inside', data);
       // checked on the server side
+      console.log('result', result);
+      console.log('error', error);
       if (error) {
-        toast.error('Something went wrong while creating the lesson');
+        toast.error('Something went wrong while updating the lesson');
         return;
       }
       // checked on the client side
       if (!data) {
-        toast.error('Something went wrong while creating the lesson');
+        toast.error('Something went wrong while updating the lesson');
         return;
       }
       if (result.status === 'success') {
-        toast.success('Lesson created successfully');
+        toast.success('Lesson updated successfully');
         form.reset();
         // redirect to the course page
         // router.push(`/courses/${data.course.slug}`);
-        router.push(`/admin/courses/${chapterId}/edit`);
+        router.push(`/admin/courses/${courseId}/edit`);
       } else if (result.status === 'error') {
         toast.error(result.message);
         return;
@@ -154,7 +155,7 @@ const EditCourseForm = ({ data, chapterId, courseId }: iAppProps) => {
               </>
             ) : (
               <>
-                Update Course <PlusSquareIcon className='ml-1' size={16} />
+                Update Lesson <PlusSquareIcon className='ml-1' size={16} />
               </>
             )}
           </Button>
@@ -164,4 +165,4 @@ const EditCourseForm = ({ data, chapterId, courseId }: iAppProps) => {
   );
 };
 
-export default EditCourseForm;
+export default LessonForm;

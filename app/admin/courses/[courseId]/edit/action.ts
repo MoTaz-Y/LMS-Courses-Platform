@@ -19,19 +19,19 @@ const aj = arcjet
     detectBot({
       mode: 'LIVE',
       allow: [],
-    })
+    }),
   )
   .withRule(
     fixedWindow({
       mode: 'LIVE',
       window: '1m',
       max: 1,
-    })
+    }),
   );
 
 export async function editCourse(
   data: CourseSchemaType,
-  courseId: string
+  courseId: string,
 ): Promise<ApiResponse> {
   const req = await request();
   const user = await requireAdmin();
@@ -78,7 +78,7 @@ export async function editCourse(
 export async function reorderLessons(
   chapterId: string,
   lessons: { id: string; position: number }[],
-  courseId: string
+  courseId: string,
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
@@ -94,7 +94,7 @@ export async function reorderLessons(
         data: {
           position: lesson.position,
         },
-      })
+      }),
     );
     await prisma.$transaction(updates);
     revalidatePath(`/admin/courses/${courseId}/edit`);
@@ -110,7 +110,7 @@ export async function reorderLessons(
 
 export async function reorderChapters(
   chapters: { id: string; position: number }[],
-  courseId: string
+  courseId: string,
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
@@ -126,7 +126,7 @@ export async function reorderChapters(
         data: {
           position: chapter.position,
         },
-      })
+      }),
     );
     await prisma.$transaction(updates);
     revalidatePath(`/admin/courses/${courseId}/edit`);
@@ -140,7 +140,7 @@ export async function reorderChapters(
 }
 
 export async function createChapter(
-  values: ChapterSchemaType
+  values: ChapterSchemaType,
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
@@ -195,7 +195,7 @@ export async function createChapter(
 
 export async function deleteChapter(
   chapterId: string,
-  courseId: string
+  courseId: string,
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
@@ -234,7 +234,7 @@ export async function deleteChapter(
 }
 
 export async function createLesson(
-  values: LessonSchemaType
+  values: LessonSchemaType,
 ): Promise<ApiResponse> {
   await requireAdmin();
   try {
@@ -343,7 +343,7 @@ export async function createLesson(
 export async function deleteLesson(
   lessonId: string,
   chapterId: string,
-  courseId: string
+  courseId: string,
 ): Promise<ApiResponse> {
   await requireAdmin();
 
