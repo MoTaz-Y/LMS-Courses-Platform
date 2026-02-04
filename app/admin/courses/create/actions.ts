@@ -12,18 +12,18 @@ const aj = arcjet
     detectBot({
       mode: 'LIVE',
       allow: [],
-    })
+    }),
   )
   .withRule(
     fixedWindow({
       mode: 'LIVE',
       window: '1m',
-      max: 1,
-    })
+      max: 5,
+    }),
   );
 
 export async function CreateCourse(
-  values: CourseSchemaType
+  values: CourseSchemaType,
 ): Promise<ApiResponse> {
   console.log('values from inside the create course function', values);
   const sesstion = await requireAdmin();
