@@ -183,7 +183,7 @@ const CourseStructure = ({ data }: iAppProps) => {
       const overChapterId = over.data.current?.chapterId;
       if (!activeChapterId || activeChapterId !== overChapterId) {
         toast.error(
-          'Lesson can not be moved between chapters or invalid Chapter ID please try again.'
+          'Lesson can not be moved between chapters or invalid Chapter ID please try again.',
         );
         return;
       }
@@ -205,7 +205,7 @@ const CourseStructure = ({ data }: iAppProps) => {
       const reordedLocalLessons = arrayMove(
         items.find((item) => item.id === activeChapterId)?.lessons || [],
         oldIndex,
-        newIndex
+        newIndex,
       );
       const updatedLessons = reordedLocalLessons.map((lesson, index) => ({
         ...lesson,
@@ -273,7 +273,7 @@ const CourseStructure = ({ data }: iAppProps) => {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
   return (
     <DndContext

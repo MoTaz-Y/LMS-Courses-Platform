@@ -37,11 +37,13 @@ import { tryCatch } from '@/hooks/try-catch';
 import { CreateCourse } from '../actions';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useConfetti } from '@/hooks/use-confetti';
 
 const CourseForm = () => {
   console.log('CourseForm component is rendering.');
   const [isPendig, startTransition] = useTransition();
   const router = useRouter();
+  const { TriggerConfetti } = useConfetti();
   // 1. Define your form.
   const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
@@ -79,6 +81,7 @@ const CourseForm = () => {
       }
       if (data.status === 'success') {
         toast.success('Course created successfully');
+        TriggerConfetti();
         form.reset();
         // redirect to the course page
         // router.push(`/courses/${data.course.slug}`);

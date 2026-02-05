@@ -25,10 +25,12 @@ import { Input } from '@/components/ui/input';
 import { createChapter } from '../action';
 import { toast } from 'sonner';
 import { tryCatch } from '@/hooks/try-catch';
+// import EmptyState from '@/components/general/EmptyState';
 
 const NewChapterModal = ({ courseId }: { courseId: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPendig, startTransition] = useTransition();
+
   // 1. Define your form.
   const form = useForm<ChapterSchemaType>({
     resolver: zodResolver(chapterSchema),

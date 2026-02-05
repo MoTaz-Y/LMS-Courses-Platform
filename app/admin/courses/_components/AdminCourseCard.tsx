@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface iAppProps {
   data: AdminCourseType;
@@ -103,3 +104,32 @@ const AdminCourseCard = ({ data }: iAppProps) => {
 };
 
 export default AdminCourseCard;
+
+export function AdminCourseCardSkeleton() {
+  return (
+    <Card className='group relative py-0 gap-0'>
+      <div className='absolute top-2 right-2 z-10 flex items-center gap-2 '>
+        <Skeleton className='w-16 h-4 rounded-full' />
+        <Skeleton className='size-6 rounded-md' />
+      </div>
+      <div className='w-full h-fit relative'>
+        <Skeleton className='w-full  rounded-t-lg aspect-video h-[200px]' />
+      </div>
+      <CardContent className='flex flex-col gap-2 p-4'>
+        <Skeleton className='w-3/4 h-6 rounded-full mb-2' />
+        <Skeleton className='w-full h-4 rounded-full mb-4' />
+        <div className='flex items-center gap-x-5'>
+          <div className='flex itmes-center gap-x-2'>
+            <Skeleton className='size-6 rounded-md' />
+            <Skeleton className='w-1/2 h-4 rounded-full' />
+          </div>
+          <div className='flex itmes-center gap-x-2'>
+            <Skeleton className='size-6 rounded-md' />
+            <Skeleton className='w-1/2 h-4 rounded-full' />
+          </div>
+        </div>
+        <Skeleton className='w-full h-10 rounded-full mt-4' />
+      </CardContent>
+    </Card>
+  );
+}

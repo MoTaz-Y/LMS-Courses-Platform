@@ -1,17 +1,21 @@
 import { adminGetCourses } from '@/app/data/admin/admin-get-courses';
 import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
-import AdminCourseCard from './_components/AdminCourseCard';
+import AdminCourseCard, {
+  AdminCourseCardSkeleton,
+} from './_components/AdminCourseCard';
 import EmptyState from '@/components/general/EmptyState';
+import { Suspense } from 'react';
 
-const CoursesPage = async () => {
-  const data = await adminGetCourses();
-  const emptyState = {
-    title: 'No Courses Found',
-    description: 'You have not created any courses yet',
-    buttonText: 'Create Course',
-    buttonLink: '/admin/courses/create',
-  };
+const emptyState = {
+  title: 'No Courses Found',
+  description: 'You have not created any courses yet',
+  buttonText: 'Create Course',
+  buttonLink: '/admin/courses/create',
+};
+
+export default function CoursesPage() {
+  // false promise about  3 seconds
 
   return (
     <>
@@ -26,6 +30,19 @@ const CoursesPage = async () => {
           Create Course
         </Link>
       </div>
+      <Suspense fallback={<AdminCourseCardSkeletonLoader />}>
+        <RenderCourse />
+      </Suspense>
+    </>
+  );
+}
+
+async function RenderCourse() {
+  const data = await adminGetCourses();
+  // const promise = new Promise((resolve) => setTimeout(resolve, 3000));
+  // await promise;
+  return (
+    <>
       {data.length > 0 ? (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-4'>
           {data.map((course) => (
@@ -37,6 +54,16 @@ const CoursesPage = async () => {
       )}
     </>
   );
-};
+}
 
-export default CoursesPage;
+function AdminCourseCardSkeletonLoader() {
+  return (
+    <>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-4'>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <AdminCourseCardSkeleton key={i} />
+        ))}
+      </div>
+    </>
+  );
+}
